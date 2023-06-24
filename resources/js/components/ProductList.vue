@@ -37,7 +37,7 @@
         </div>
 
         <div class="finish-cart">
-            <button class="btn-finish-cart" @click="fecharPedido" :disabled="cart.length === 0">
+            <button class="btn-finish-cart" @click="closeOrder" :disabled="cart.length === 0">
                 <i class="fas fa-shopping-cart"></i> &nbsp Fechar Pedido
             </button>
         </div>
@@ -75,7 +75,46 @@ export default {
                 }).catch(error => {
                     console.error("Error fetching products!" . error);
             });
-        }
+        },
+        closeOrder() {
+            if (this.cart.length === 0) {
+
+                return;
+            }
+
+            const items = this.cart.map((item) => {
+                return {
+                    product_id: item.id,
+                    quantity: item.quantity,
+                };
+            });
+
+            const total = this.total
+            const payload = {
+                items,
+                total,
+            };
+
+            fetch('api/sales', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Error!');
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log('Venda criada com sucesso', data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        },
     },
 };
 </script>
