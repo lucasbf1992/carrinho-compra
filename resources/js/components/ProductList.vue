@@ -10,7 +10,7 @@
                     </div>
                     <div class="product-info">
                         <div class="product-name">{{ product.name }}</div>
-                        <div class="product-price">Preço: <span class="price-value">R$ {{ product.price.toFixed(2) }}</span></div>
+                        <div class="product-price">Preço: <span class="price-value">R$ {{ parseFloat(product.price).toFixed(2) }}</span></div>
                     </div>
                 </div>
 
@@ -25,7 +25,7 @@
                     <div class="item-cart">
                         <span class="item-quantity">{{item.quantity}}x</span>
                         <span class="item-name">{{ item.name }}</span>
-                        <span class="item-price">R$ {{ item.price.toFixed(2) }}</span>
+                        <span class="item-price">R$ {{ parseFloat(item.price).toFixed(2) }}</span>
                     </div>
                 </li>
             </ul>
@@ -49,13 +49,13 @@
 export default {
     data() {
         return {
-            products: [
-                {id: 1, name: 'Produto 1', price: 10.99},
-                {id: 2, name: 'Produto 2', price: 19.99},
-            ],
+            products: [],
             cart: [],
             total: 0,
         };
+    },
+    mounted() {
+        this.fetchProducts()
     },
     methods: {
         addToCart(product) {
@@ -65,8 +65,17 @@ export default {
             } else {
                 this.cart.push({...product, quantity: 1});
             }
-            this.total += product.price;
+            this.total += parseFloat(product.price);
         },
+        fetchProducts() {
+            fetch('api/products')
+                .then(response => response.json())
+                .then(data => {
+                    this.products = data.data;
+                }).catch(error => {
+                    console.error("Error fetching products!" . error);
+            });
+        }
     },
 };
 </script>
